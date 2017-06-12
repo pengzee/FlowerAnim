@@ -1,5 +1,7 @@
 package work.pengzhe.com.objectanim;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
@@ -17,8 +19,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import java.util.Random;
 
@@ -30,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private PointF endPoint;
     private Drawable[] drawables;
     private Interpolator[] interpolators;
-    private LinearLayout rootView;
+    private FrameLayout rootView;
     int width;
     int height;
 
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         WindowManager wm = this.getWindowManager();
-        rootView = (LinearLayout) findViewById(R.id.ll);
+        rootView = (FrameLayout) findViewById(R.id.ll);
         width = wm.getDefaultDisplay().getWidth();
         height = wm.getDefaultDisplay().getHeight();
         startPoint = new PointF(width / 2 - 50, height);
@@ -90,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
         ImageView flower = new ImageView(this);
         flower.setLayoutParams(new ViewGroup.LayoutParams(100, 100));
         flower.setBackground(drawables[new Random().nextInt(drawables.length)]);
+        flower.setX(startPoint.x);
+        flower.setY(startPoint.y);
         rootView.addView(flower);
         startAnin(flower);
     }
@@ -104,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         final AnimatorSet animatorSet = new AnimatorSet();
 
         ObjectAnimator alphaAnim = ObjectAnimator.ofFloat(flower, "alpha", 0, 1);
-        alphaAnim.setDuration(200);
+        alphaAnim.setDuration(400);
 
         final ValueAnimator animator = ValueAnimator.ofObject(new MyTypeEvaluator(getPoint(0), getPoint(1)), startPoint, endPoint);
         animator.setDuration(4000);
@@ -117,8 +121,16 @@ public class MainActivity extends AppCompatActivity {
                 flower.setY(pointF.y);
             }
         });
+
         //  animator.start();
-        animatorSet.play(alphaAnim).before(animator);
+        animatorSet.play(alphaAnim).with(animator);
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                rootView.removeView(flower);
+            }
+        });
         animatorSet.start();
     }
 
