@@ -107,8 +107,13 @@ public class MainActivity extends AppCompatActivity {
     private void startAnin(final ImageView flower) {
         final AnimatorSet animatorSet = new AnimatorSet();
 
-        ObjectAnimator alphaAnim = ObjectAnimator.ofFloat(flower, "alpha", 0, 1);
+        ObjectAnimator alphaAnim = ObjectAnimator.ofFloat(flower, "alpha", 1.0f, 0.3f);
         alphaAnim.setDuration(400);
+
+        ObjectAnimator scaleAnimX = ObjectAnimator.ofFloat(flower, "scaleX", 0.4f, 1.0f);
+        ObjectAnimator scaleAnimY = ObjectAnimator.ofFloat(flower, "scaleY", 0.4f, 1.0f);
+        scaleAnimX.setDuration(1800);
+        scaleAnimY.setDuration(1800);
 
         final ValueAnimator animator = ValueAnimator.ofObject(new MyTypeEvaluator(getPoint(0), getPoint(1)), startPoint, endPoint);
         animator.setDuration(4000);
@@ -123,7 +128,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //  animator.start();
-        animatorSet.play(alphaAnim).with(animator);
+        animatorSet.play(animator);
+        animatorSet.play(scaleAnimX).with(scaleAnimY).before(alphaAnim);
         animatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
